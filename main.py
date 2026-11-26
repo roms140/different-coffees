@@ -1,8 +1,18 @@
 import sys
 import sqlite3
-from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QMainWindow, QHeaderView, QTableWidgetItem, QDialog, QAbstractItemView, QMessageBox
 from PyQt6.QtCore import Qt
+from UI.main_ui import Ui_MainWindow
+from UI.addEditCoffeeForm import Ui_Form
+from pathlib import Path
+
+
+if getattr(sys, "frozen", False):
+    BASE_DIR = Path(sys.executable).resolve().parent
+else:
+    BASE_DIR = Path(__file__).resolve().parent
+
+DB_PATH = BASE_DIR / "data" / "coffee.sqlite"
 
 
 def get_all_coffee():
@@ -14,7 +24,7 @@ def get_all_coffee():
 
 
 def get_connection():
-    con = sqlite3.connect("coffee.sqlite")
+    con = sqlite3.connect(DB_PATH)
     return con
 
 
@@ -50,10 +60,10 @@ def db_get_data_coffee(coffee_id):
     return coffee
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('main.ui', self)
+        self.setupUi(self)
         self.addButton.clicked.connect(self.add_coffee)
         self.editButton.clicked.connect(self.edit_coffee)
         self.fill_table()
@@ -116,10 +126,10 @@ class MainWindow(QMainWindow):
             self.load_coffee(get_all_coffee())
 
 
-class CoffeeDialog(QDialog):
+class CoffeeDialog(QDialog, Ui_Form):
     def __init__(self, parent=None, id_coffee=None):
         super().__init__(parent)
-        uic.loadUi("addEditCoffeeForm.ui", self)
+        self.setupUi(self)
         self.saveButton.clicked.connect(self.save_coffee)
 
         self.id_coffee = id_coffee
